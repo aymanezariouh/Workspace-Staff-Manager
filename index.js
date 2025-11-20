@@ -2,28 +2,6 @@ const openBtn = document.querySelector(".open-pop");
 const popUp = document.querySelector(".pop-P");
 const closePop = document.querySelector(".close-pop");
 const saveBtn = document.querySelector(".saveStaff");
-
-if (openBtn) {
-  openBtn.onclick = () => {
-    popUp.style.display = "flex";
-    document.body.style.overflow = "hidden";
-  };
-}
-
-if (closePop) {
-  closePop.onclick = () => {
-    popUp.style.display = "none";
-    document.body.style.overflow = "auto";
-  };
-}
-
-popUp.addEventListener("click", (e) => {
-  if (e.target === popUp) {
-    popUp.style.display = "none";
-    document.body.style.overflow = "auto";
-  }
-});
-
 const nom = document.getElementById("inputnom");
 const role = document.getElementById("inputrole");
 const photo = document.getElementById("inputphoto");
@@ -33,43 +11,92 @@ const xpBtn = document.getElementById("xpBtn");
 const divExperience = document.querySelector(".xpdiv");
 const staffList = document.querySelector(".les-staff");
 const preview = document.getElementById("photo-preview");
+const roomButtons = document.querySelectorAll(".place-staff");
+const profilePop = document.querySelector(".profile-pop");
+const closeProfile = document.getElementById("close-profile");
 
 let allStaffs = [];
 let count = 0;
 
-photo.oninput = () => {
-  if (!preview) return;
-  preview.src = photo.value;
-  preview.style.display = photo.value ? "block" : "none";
-};
+init();
 
-xpBtn.onclick = () => {
+function init() {
+  setupFormModal();
+  setupFormEvents();
+  setupRoomButtons();
+  setupProfilePopup();
+  updateRoomColors();
+}
+
+function setupFormModal() {
+  if (openBtn && popUp) {
+    openBtn.addEventListener("click", () => openFormModal());
+  }
+
+  if (closePop) {
+    closePop.addEventListener("click", () => closeFormModal());
+  }
+
+  if (popUp) {
+    popUp.addEventListener("click", (e) => {
+      if (e.target === popUp) closeFormModal();
+    });
+  }
+}
+
+function openFormModal() {
+  if (!popUp) return;
+  popUp.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeFormModal() {
+  if (!popUp) return;
+  popUp.style.display = "none";
+  document.body.style.overflow = "auto";
+}
+
+function setupFormEvents() {
+  if (xpBtn) {
+    xpBtn.addEventListener("click", addExperienceBlock);
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", handleSaveStaff);
+  }
+}
+
+function addExperienceBlock() {
   count++;
+
+  if (!divExperience) return;
+
   const div = document.createElement("div");
   div.className = "exp-form";
   div.innerHTML = `
     <label>Entreprise</label>
     <input id="nom-${count}">
-    <label>Rôle</label>
+    <label>R��le</label>
     <select id="role-${count}">
       <option value="Receptionnistes">Receptionnistes</option>
       <option value="Techniciens IT">Techniciens IT</option>
       <option value="Agents de securite">Agents de securite</option>
       <option value="Manager">Manager</option>
-      <option value="Autres roles">Autres rôles</option>
+      <option value="Autres roles">Autres r��les</option>
       <option value="Nettoyage">Nettoyage</option>
     </select>
     <label>De</label>
     <input type="date" id="date-de-${count}">
-    <label>À</label>
+    <label>�?</label>
     <input type="date" id="date-a-${count}">
     <button type="button" class="remove-exp">X</button>
   `;
+
   div.querySelector(".remove-exp").onclick = () => div.remove();
   divExperience.appendChild(div);
-};
+}
 
-saveBtn.onclick = (e) => {
+function handleSaveStaff(e) {
   e.preventDefault();
 
   if (!nom.value.trim() || !role.value || !email.value || !telephone.value) {
@@ -84,20 +111,32 @@ saveBtn.onclick = (e) => {
     photo: photo.value,
     email: email.value,
     phone: telephone.value,
-    experiences: [],
+    experiences: collectExperiences(),
     assignedTo: null
   };
 
+  allStaffs.push(staffMember);
+  createStaffCard(staffMember);
+
+  resetForm();
+  closeFormModal();
+  updateRoomColors();
+}
+
+function collectExperiences() {
+  if (!divExperience) return [];
+
+  const experiences = [];
   const expBlocks = divExperience.querySelectorAll(".exp-form");
 
   expBlocks.forEach((block, index) => {
-    const ent = block.querySelector(`#nom-${index + 1}`).value;
-    const r = block.querySelector(`#role-${index + 1}`).value;
-    const de = block.querySelector(`#date-de-${index + 1}`).value;
-    const a = block.querySelector(`#date-a-${index + 1}`).value;
+    const ent = block.querySelector(`#nom-${index + 1}`)?.value;
+    const r = block.querySelector(`#role-${index + 1}`)?.value;
+    const de = block.querySelector(`#date-de-${index + 1}`)?.value;
+    const a = block.querySelector(`#date-a-${index + 1}`)?.value;
 
     if (ent && r && de && a) {
-      staffMember.experiences.push({
+      experiences.push({
         entreprise: ent,
         role: r,
         dateStart: de,
@@ -106,22 +145,61 @@ saveBtn.onclick = (e) => {
     }
   });
 
-  allStaffs.push(staffMember);
-  createStaffCard(staffMember);
+  return experiences;
+}
 
-  resetForm();
-  popUp.style.display = "none";
-  document.body.style.overflow = "auto";
-  updateRoomColors();
-};
+function setupRoomButtons() {
+  roomButtons.forEach((button) => {
+    button.addEventListener("click", () => handleRoomButtonClick(button));
+  });
+}
+
+function handleRoomButtonClick(button) {
+  const roomBox = button.closest(".box");
+  const roomType = getRoomType(roomBox);
+  if (!roomType) return;
+
+  const eligible = getEligibleStaff(roomType);
+
+  if (eligible.length === 0) {
+    alert("Aucun employe eligible n'est disponible pour cette zone.");
+    return;
+  }
+
+  const selected = promptStaffSelection(eligible);
+  if (!selected) return;
+
+  assignStaffToRoom(selected, roomBox);
+}
+
+function promptStaffSelection(eligible) {
+  let message = "Choisissez un employe :\n";
+  eligible.forEach((e, i) => {
+    message += `${i + 1} - ${e.name} (${e.role})\n`;
+  });
+
+  const choix = prompt(message);
+  const index = parseInt(choix, 10);
+
+  if (isNaN(index) || index < 1 || index > eligible.length) return null;
+
+  return eligible[index - 1];
+}
+
+function setupProfilePopup() {
+  if (closeProfile) {
+    closeProfile.addEventListener("click", () => closeProfilePopup());
+  }
+}
 
 function createStaffCard(staffMember) {
+  if (!staffList) return;
   const div = document.createElement("div");
   div.className = "staff-card";
   div.dataset.id = staffMember.id;
 
   div.innerHTML = `
-    <img src="${staffMember.photo || 'default-avatar.png'}">
+    <img src="${staffMember.photo || "default-avatar.png"}">
     <h3>${staffMember.name}</h3>
     <p>${staffMember.role}</p>
   `;
@@ -137,44 +215,21 @@ function resetForm() {
   photo.value = "";
   email.value = "";
   telephone.value = "";
-  divExperience.innerHTML = "";
+
+  if (divExperience) {
+    divExperience.innerHTML = "";
+  }
+
   if (preview) {
     preview.style.display = "none";
     preview.src = "";
   }
+
   count = 0;
 }
 
-const roomButtons = document.querySelectorAll(".place-staff");
-
-roomButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const roomBox = button.closest(".box");
-    const roomType = getRoomType(roomBox);
-    if (!roomType) return;
-
-    const eligible = getEligibleStaff(roomType);
-
-    if (eligible.length === 0) {
-      alert("Aucun employé éligible n'est disponible pour cette zone.");
-      return;
-    }
-
-    let message = "Choisissez un employé :\n";
-    eligible.forEach((e, i) => {
-      message += `${i + 1} - ${e.name} (${e.role})\n`;
-    });
-
-    const choix = prompt(message);
-    const index = parseInt(choix, 10);
-
-    if (isNaN(index) || index < 1 || index > eligible.length) return;
-
-    assignStaffToRoom(eligible[index - 1], roomBox);
-  });
-});
-
 function getRoomType(roomBox) {
+  if (!roomBox) return null;
   if (roomBox.classList.contains("reception")) return "reception";
   if (roomBox.classList.contains("server-room")) return "server";
   if (roomBox.classList.contains("security-room")) return "security";
@@ -204,9 +259,11 @@ function assignStaffToRoom(staffMember, roomBox) {
   const roomType = getRoomType(roomBox);
   staffMember.assignedTo = roomType;
 
-  staffList.querySelectorAll(".staff-card").forEach((card) => {
-    if (card.dataset.id === String(staffMember.id)) card.remove();
-  });
+  if (staffList) {
+    staffList.querySelectorAll(".staff-card").forEach((card) => {
+      if (card.dataset.id === String(staffMember.id)) card.remove();
+    });
+  }
 
   const slot = roomBox.querySelector(".staff-slot");
 
@@ -214,7 +271,7 @@ function assignStaffToRoom(staffMember, roomBox) {
   div.className = "staff-card";
   div.dataset.id = staffMember.id;
   div.innerHTML = `
-    <img src="${staffMember.photo || 'default-avatar.png'}">
+    <img src="${staffMember.photo || "default-avatar.png"}">
     <h3>${staffMember.name}</h3>
     <p>${staffMember.role}</p>
     <button class="remove-staff">X</button>
@@ -258,13 +315,11 @@ function updateRoomColors() {
   });
 }
 
-updateRoomColors();
-
-const profilePop = document.querySelector(".profile-pop");
-const closeProfile = document.getElementById("close-profile");
-
 function openProfile(staff) {
-  document.getElementById("profile-photo").src = staff.photo || "default-avatar.png";
+  if (!profilePop) return;
+
+  document.getElementById("profile-photo").src =
+    staff.photo || "default-avatar.png";
   document.getElementById("profile-name").textContent = staff.name;
   document.getElementById("profile-role").textContent = staff.role;
   document.getElementById("profile-email").textContent = staff.email;
@@ -278,16 +333,17 @@ function openProfile(staff) {
   if (staff.experiences && staff.experiences.length > 0) {
     staff.experiences.forEach((exp) => {
       const li = document.createElement("li");
-      li.textContent = `${exp.entreprise} (${exp.dateStart} → ${exp.dateEnd})`;
+      li.textContent = `${exp.entreprise} (${exp.dateStart} ��' ${exp.dateEnd})`;
       expList.appendChild(li);
     });
   } else {
-    expList.innerHTML = "<li>Aucune expérience</li>";
+    expList.innerHTML = "<li>Aucune exp�rience</li>";
   }
 
   profilePop.style.display = "flex";
 }
 
-closeProfile.onclick = () => {
+function closeProfilePopup() {
+  if (!profilePop) return;
   profilePop.style.display = "none";
-};
+}
