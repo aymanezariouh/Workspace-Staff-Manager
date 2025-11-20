@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+<div class="profile-pop">
+    <div class="profile-box">
+        <h2>Profil</h2>
+        <img id="profile-photo" src="" alt="">
+        <p><strong>Nom :</strong> <span id="profile-name"></span></p>
+        <p><strong>Rôle :</strong> <span id="profile-role"></span></p>
+        <p><strong>Email :</strong> <span id="profile-email"></span></p>
+        <p><strong>Téléphone :</strong> <span id="profile-phone"></span></p>
+        <p><strong>Localisation :</strong> <span id="profile-location"></span></p>
+
+        <h3>Expériences :</h3>
+        <ul id="profile-exp"></ul>
+
+        <button id="close-profile">Fermer</button>
+    </div>
+</div>
+
+        <div class="pop-P">
+    <div class="pop">
+        <h1>Ajout de staff</h1>
+
+        <form id="staff-form">
+
+            <div>
+                <label for="inputnom">Nom Complet</label><br>
+                <input type="text" id="inputnom" required>
+            </div>
+
+            <div>
+                <label for="inputrole">Rôle</label><br>
+                <select id="inputrole" required>
+                    <option value="Receptionnistes">Receptionnistes</option>
+                    <option value="Techniciens IT">Techniciens IT</option>
+                    <option value="Agents de securite">Agents de securite</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Autres roles">Autres rôles</option>
+                    <option value="Nettoyage">Nettoyage</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="inputphoto">Photo (URL)</label><br>
+                <input type="text" id="inputphoto">
+                <div class="photo-preview">
+                    <img id="photo-preview" alt="Aperçu de la photo">
+                </div>
+            </div>
+
+            <div>
+                <label for="inputemail">Email</label><br>
+                <input type="email" id="inputemail" required>
+            </div>
+
+            <div>
+                <label for="inputphone">Téléphone</label><br>
+                <input type="tel" id="inputphone" required>
+            </div>
+
+            <div>
+                <label>Expériences professionnelles</label>
+                <div class="xpdiv"></div>
+                <button type="button" id="xpBtn">Ajouter une expérience</button>
+            </div>
+
+            <div class="form-buttons">
+                <button type="button" class="close-pop">Annuler</button>
+                <button type="submit" class="saveStaff">Enregistrer</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+        <aside>
+            <h2>Unassigned Staff</h2>
+            <div class="les-staff"></div>
+            <button class="open-pop">Add Staff</button>
+        </aside>
+        <div class="staff-grid">
+    <div class="reception box">
+        <h3>Réception</h3>
+        <div class="staff-slot"></div>
+        <button class="place-staff">+</button>
+    </div>
+
+    <div class="server-room box">
+        <h3>Salle des serveurs</h3>
+        <div class="staff-slot"></div>
+        <button class="place-staff">+</button>
+    </div>
+
+    <div class="security-room box">
+        <h3>Salle de sécurité</h3>
+        <div class="staff-slot"></div>
+        <button class="place-staff">+</button>
+    </div>
+
+    <div class="conference-room box">
+        <h3>Salle de conférence</h3>
+        <div class="staff-slot"></div>
+        <button class="place-staff">+</button>
+    </div>
+
+    <div class="personnel-room box">
+        <h3>Salle du personnel</h3>
+        <div class="staff-slot"></div>
+        <button class="place-staff">+</button>
+    </div>
+
+    <div class="archives-room box">
+        <h3>Salle d'archives</h3>
+        <div class="staff-slot"></div>
+        <button class="place-staff">+</button>
+    </div>
+</div>
+
+
+    </main>
+
+    <script src="index.js"></script>
+</body>
+</html>
