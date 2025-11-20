@@ -44,8 +44,8 @@ aside h2 {
   flex: 1;
   padding: 2em;
   display: grid;
-  grid-template-columns: repeat(3, 300px);
-  grid-template-rows: repeat(2, 200px);
+  grid-template-columns: repeat(3, 490px);
+  grid-template-rows: repeat(2, 350px);
   gap: 20px;
 }
 
