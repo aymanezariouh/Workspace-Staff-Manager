@@ -14,9 +14,17 @@ const preview = document.getElementById("photo-preview");
 const roomButtons = document.querySelectorAll(".place-staff");
 const profilePop = document.querySelector(".profile-pop");
 const closeProfile = document.getElementById("close-profile");
+const assignPop = document.querySelector(".assign-pop");
+const assignList = document.querySelector(".assign-list");
+const assignRoomName = document.querySelector(".assign-room-name");
+const assignEmpty = document.querySelector(".assign-empty");
+const closeAssignButtons = document.querySelectorAll(".close-assign");
+const defaultAssignEmptyText = assignEmpty ? assignEmpty.textContent : "";
+const MAX_ROOM_STAFF = 3;
 
 let allStaffs = [];
 let count = 0;
+let roomToAssign = null;
 
 init();
 
@@ -25,23 +33,23 @@ function init() {
   setupFormEvents();
   setupRoomButtons();
   setupProfilePopup();
+  setupAssignPopup();
   updateRoomColors();
 }
-
 function setupFormModal() {
-  if (openBtn && popUp) {
-    openBtn.addEventListener("click", () => openFormModal());
-  }
-
-  if (closePop) {
-    closePop.addEventListener("click", () => closeFormModal());
-  }
-
-  if (popUp) {
-    popUp.addEventListener("click", (e) => {
-      if (e.target === popUp) closeFormModal();
+if (openBtn && popUp){
+    openBtn.addEventListener('click', ()=> openFormModal());
+}
+if(closePop){
+  closePop.addEventListener('click',  ()=> closeFormModal());
+}
+if(popUp){
+  popUp.addEventListener('click' , (e) => {
+    if (e.target === popUp){ 
+      closeFormModal();
+    }
     });
-  }
+}
 }
 
 function openFormModal() {
@@ -76,18 +84,18 @@ function addExperienceBlock() {
   div.innerHTML = `
     <label>Entreprise</label>
     <input id="nom-${count}">
-    <label>R��le</label>
+    <label>Role</label>
     <select id="role-${count}">
       <option value="Receptionnistes">Receptionnistes</option>
       <option value="Techniciens IT">Techniciens IT</option>
       <option value="Agents de securite">Agents de securite</option>
       <option value="Manager">Manager</option>
-      <option value="Autres roles">Autres r��les</option>
+      <option value="Autres roles">Autres roles</option>
       <option value="Nettoyage">Nettoyage</option>
     </select>
     <label>De</label>
     <input type="date" id="date-de-${count}">
-    <label>�?</label>
+    <label>?</label>
     <input type="date" id="date-a-${count}">
     <button type="button" class="remove-exp">X</button>
   `;
@@ -112,7 +120,7 @@ function handleSaveStaff(e) {
     email: email.value,
     phone: telephone.value,
     experiences: collectExperiences(),
-    assignedTo: null
+    assignedTo: null,
   };
 
   allStaffs.push(staffMember);
@@ -140,7 +148,7 @@ function collectExperiences() {
         entreprise: ent,
         role: r,
         dateStart: de,
-        dateEnd: a
+        dateEnd: a,
       });
     }
   });
@@ -153,37 +161,74 @@ function setupRoomButtons() {
     button.addEventListener("click", () => handleRoomButtonClick(button));
   });
 }
+function setupAssignPopup() {
+  closeAssignButtons.forEach((btn) =>
+    btn.addEventListener("click", () => closeAssignPopup())
+  );
+
+  if (assignPop) {
+    assignPop.addEventListener("click", (e) => {
+      if (e.target === assignPop) closeAssignPopup();
+    });
+  }
+}
+function openAssignPopup(roomBox, eligible, message = "") {
+  if (!assignPop || !assignList) return;
+  roomToAssign = roomBox;
+  if (assignRoomName) {
+    const label = roomBox?.querySelector("h3");
+    assignRoomName.textContent = label ? label.textContent : "";
+  }
+  assignList.innerHTML = "";
+  const showMessage = eligible.length === 0 || Boolean(message);
+  if (showMessage) {
+    assignList.style.display = "none";
+    if (assignEmpty) {
+      assignEmpty.textContent = message || defaultAssignEmptyText;
+      assignEmpty.style.display = "block";
+    }
+  } else {
+    assignList.style.display = "flex";
+    if (assignEmpty) {
+      assignEmpty.textContent = defaultAssignEmptyText;
+      assignEmpty.style.display = "none";
+    }
+    eligible.forEach((staff) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "assign-option";
+      btn.innerHTML = `
+        <strong>${staff.name}</strong>
+        <span>${staff.role}</span>
+      `;
+      btn.addEventListener("click", () => {
+        assignStaffToRoom(staff, roomToAssign);
+        closeAssignPopup();
+      });
+      assignList.appendChild(btn);
+    });
+  }
+assignPop.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeAssignPopup() {
+  if (!assignPop || !assignList) return;
+  assignPop.style.display = "none";
+  document.body.style.overflow = "auto";
+  assignList.innerHTML = "";
+  assignList.style.display = "flex";
+  if (assignEmpty) assignEmpty.style.display = "none";
+  if (assignRoomName) assignRoomName.textContent = "";
+  roomToAssign = null;
+}
 
 function handleRoomButtonClick(button) {
   const roomBox = button.closest(".box");
   const roomType = getRoomType(roomBox);
   if (!roomType) return;
-
   const eligible = getEligibleStaff(roomType);
-
-  if (eligible.length === 0) {
-    alert("Aucun employe eligible n'est disponible pour cette zone.");
-    return;
-  }
-
-  const selected = promptStaffSelection(eligible);
-  if (!selected) return;
-
-  assignStaffToRoom(selected, roomBox);
-}
-
-function promptStaffSelection(eligible) {
-  let message = "Choisissez un employe :\n";
-  eligible.forEach((e, i) => {
-    message += `${i + 1} - ${e.name} (${e.role})\n`;
-  });
-
-  const choix = prompt(message);
-  const index = parseInt(choix, 10);
-
-  if (isNaN(index) || index < 1 || index > eligible.length) return null;
-
-  return eligible[index - 1];
+  openAssignPopup(roomBox, eligible);
 }
 
 function setupProfilePopup() {
@@ -193,11 +238,9 @@ function setupProfilePopup() {
 }
 
 function createStaffCard(staffMember) {
-  if (!staffList) return;
   const div = document.createElement("div");
   div.className = "staff-card";
   div.dataset.id = staffMember.id;
-
   div.innerHTML = `
     <img src="${staffMember.photo || "default-avatar.png"}">
     <h3>${staffMember.name}</h3>
@@ -226,6 +269,13 @@ function resetForm() {
   }
 
   count = 0;
+}
+
+function isRoomFull(roomBox) {
+  if (!roomBox) return false;
+  const slot = roomBox.querySelector(".staff-slot");
+  if (!slot) return false;
+  return slot.children.length >= MAX_ROOM_STAFF;
 }
 
 function getRoomType(roomBox) {
@@ -259,11 +309,9 @@ function assignStaffToRoom(staffMember, roomBox) {
   const roomType = getRoomType(roomBox);
   staffMember.assignedTo = roomType;
 
-  if (staffList) {
-    staffList.querySelectorAll(".staff-card").forEach((card) => {
-      if (card.dataset.id === String(staffMember.id)) card.remove();
-    });
-  }
+  staffList.querySelectorAll(".staff-card").forEach((card) => {
+    if (card.dataset.id === String(staffMember.id)) card.remove();
+  });
 
   const slot = roomBox.querySelector(".staff-slot");
 
@@ -324,8 +372,9 @@ function openProfile(staff) {
   document.getElementById("profile-role").textContent = staff.role;
   document.getElementById("profile-email").textContent = staff.email;
   document.getElementById("profile-phone").textContent = staff.phone;
-  document.getElementById("profile-location").textContent =
-    staff.assignedTo ? staff.assignedTo : "Unassigned";
+  document.getElementById("profile-location").textContent = staff.assignedTo
+    ? staff.assignedTo
+    : "Unassigned";
 
   const expList = document.getElementById("profile-exp");
   expList.innerHTML = "";
@@ -333,11 +382,11 @@ function openProfile(staff) {
   if (staff.experiences && staff.experiences.length > 0) {
     staff.experiences.forEach((exp) => {
       const li = document.createElement("li");
-      li.textContent = `${exp.entreprise} (${exp.dateStart} ��' ${exp.dateEnd})`;
+      li.textContent = `${exp.entreprise} (${exp.dateStart} -- ${exp.dateEnd})`;
       expList.appendChild(li);
     });
   } else {
-    expList.innerHTML = "<li>Aucune exp�rience</li>";
+    expList.innerHTML = "<li>Aucune experience</li>";
   }
 
   profilePop.style.display = "flex";

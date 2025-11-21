@@ -2,13 +2,12 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Lucida Sans", sans-serif;
+	font-family: sans-serif;
 }
 
 body {
-  background: #f5f5f5;
+  background: linear-gradient(to right);
 }
-
 main {
   display: flex;
   padding: 20px;
@@ -22,7 +21,7 @@ aside {
   padding: 1em;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 aside h2 {
@@ -41,10 +40,12 @@ aside h2 {
   cursor: pointer;
   font-size: 14px;
   transition: background 0.3s ease;
+	transition: transform 0.8s ease;
 }
 
 .open-pop:hover {
   background: #1a75d9;
+	transform: scale( 0.8 , 1.2  );
 }
 
 .staff-grid {
@@ -57,6 +58,7 @@ aside h2 {
 }
 
 .box {
+  position: relative;
   background: white;
   text-align: center;
   border: 2px solid #ddd;
@@ -65,24 +67,44 @@ aside h2 {
   flex-direction: column;
   padding: 20px;
   gap: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+  overflow: hidden;
 }
 
 .box:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.box > * {
+  position: relative;
+  z-index: 1;
 }
 
 .box h3 {
   font-size: 1.1rem;
   margin-bottom: 5px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 .staff-slot {
   flex: 1;
   overflow-y: auto;
-  border: 1px dashed #bbb;
+  border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 10px;
   border-radius: 12px;
   display: flex;
@@ -90,6 +112,38 @@ aside h2 {
   justify-content: center;
   align-content: flex-start;
   gap: 8px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(1px);
+}
+
+.reception {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+    url("images/reception--.png");
+}
+
+.server-room {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+    url("images/serveurs--.png");
+}
+
+.security-room {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+    url("images/securiter--.png");
+}
+
+.conference-room {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+    url("images/coverence--.png");
+}
+
+.personnel-room {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+    url("images/personnel--.png");
+}
+
+.archives-room {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+    url("images/archives--.png");
 }
 
 .place-staff {
@@ -125,14 +179,14 @@ aside h2 {
 
 .pop-P {
   position: fixed;
-  top: 0; 
+  top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: none;              
-  justify-content: center;    
-  align-items: center;        
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
   padding: 20px;
   overflow-y: auto;
   z-index: 999;
@@ -146,7 +200,7 @@ aside h2 {
   border-radius: 20px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .pop h1 {
@@ -166,6 +220,7 @@ aside h2 {
   align-items: center;
   gap: 8px;
   transition: transform 0.2s ease;
+	color: black;
 }
 
 .staff-card:hover {
@@ -212,7 +267,7 @@ aside h2 {
   border-radius: 10px;
   background: white;
   border: 1px solid #ccc;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .staff-slot .staff-card img {
@@ -323,7 +378,7 @@ aside h2 {
   background: #f2f2f2;
   padding: 15px;
   border-radius: 12px;
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 10px;
   position: relative;
 }
@@ -353,11 +408,11 @@ aside h2 {
 
 .profile-pop {
   position: fixed;
-  top: 0; 
+  top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: none;
   justify-content: center;
   align-items: center;
@@ -371,7 +426,7 @@ aside h2 {
   max-width: 400px;
   border-radius: 15px;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .profile-box img {
