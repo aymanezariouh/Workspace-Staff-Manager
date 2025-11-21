@@ -208,7 +208,7 @@ function openAssignPopup(roomBox, eligible, message = "") {
       assignList.appendChild(btn);
     });
   }
-assignPop.style.display = "flex";
+  assignPop.style.display = "flex";
   document.body.style.overflow = "hidden";
 }
 
@@ -218,7 +218,10 @@ function closeAssignPopup() {
   document.body.style.overflow = "auto";
   assignList.innerHTML = "";
   assignList.style.display = "flex";
-  if (assignEmpty) assignEmpty.style.display = "none";
+  if (assignEmpty) {
+    assignEmpty.style.display = "none";
+    assignEmpty.textContent = defaultAssignEmptyText;
+  }
   if (assignRoomName) assignRoomName.textContent = "";
   roomToAssign = null;
 }
@@ -227,6 +230,14 @@ function handleRoomButtonClick(button) {
   const roomBox = button.closest(".box");
   const roomType = getRoomType(roomBox);
   if (!roomType) return;
+  if (isRoomFull(roomBox)) {
+    openAssignPopup(
+      roomBox,
+      [],
+      "Cette salle est déjà complète (maximum 3 staff)."
+    );
+    return;
+  }
   const eligible = getEligibleStaff(roomType);
   openAssignPopup(roomBox, eligible);
 }
