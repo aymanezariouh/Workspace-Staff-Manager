@@ -26,6 +26,13 @@ const formPatterns = {
   phone: /^[0-9]{7,12}$/,
   photo: /^https?:\/\//i
 };
+const formErrors = {
+  name: document.querySelector("[data-error='name']"),
+  role: document.querySelector("[data-error='role']"),
+  email: document.querySelector("[data-error='email']"),
+  phone: document.querySelector("[data-error='phone']"),
+  photo: document.querySelector("[data-error='photo']")
+};
 
 let defaultAssignMessage = "";
 if (assignEmptyText) {
@@ -55,13 +62,6 @@ function setupFormPopup() {
   }
   if (btnCloseForm) {
     btnCloseForm.addEventListener("click", closeForm);
-  }
-  if (formPopup) {
-    formPopup.addEventListener("click", function (e) {
-      if (e.target === formPopup) {
-        closeForm();
-      }
-    });
   }
 }
 
