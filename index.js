@@ -1,34 +1,38 @@
-const btnOpenForm = document.querySelector(".open-pop");
-const formPopup = document.querySelector(".pop-P");
-const btnCloseForm = document.querySelector(".close-pop");
-const btnSave = document.querySelector(".saveStaff");
+﻿let btnOpenForm = document.querySelector(".open-pop");
+let formPopup = document.querySelector(".pop-P");
+let btnCloseForm = document.querySelector(".close-pop");
+let btnSave = document.querySelector(".saveStaff");
+let fieldName = document.getElementById("inputnom");
+let fieldRole = document.getElementById("inputrole");
+let fieldPhoto = document.getElementById("inputphoto");
+let fieldEmail = document.getElementById("inputemail");
+let fieldPhone = document.getElementById("inputphone");
+let btnAddXp = document.getElementById("xpBtn");
+let xpContainer = document.querySelector(".xpdiv");
+let staffContainer = document.querySelector(".les-staff");
+let photoPreview = document.getElementById("photo-preview");
+let roomButtons = document.querySelectorAll(".place-staff");
+let profilePopup = document.querySelector(".profile-pop");
+let btnCloseProfile = document.getElementById("close-profile");
+let assignPopup = document.querySelector(".assign-pop");
+let assignList = document.querySelector(".assign-list");
+let assignRoomTitle = document.querySelector(".assign-room-name");
+let assignEmptyText = document.querySelector(".assign-empty");
+let btnCloseAssignList = document.querySelectorAll(".close-assign");
+const formPatterns = {
+  name: /^[A-Za-z ]{3,25}$/,
+  role: /^.+$/,
+  email: /^.+@.+\..+$/,
+  phone: /^[0-9]{7,12}$/,
+  photo: /^https?:\/\//i
+};
 
-const fieldName = document.getElementById("inputnom");
-const fieldRole = document.getElementById("inputrole");
-const fieldPhoto = document.getElementById("inputphoto");
-const fieldEmail = document.getElementById("inputemail");
-const fieldPhone = document.getElementById("inputphone");
+let defaultAssignMessage = "";
+if (assignEmptyText) {
+  defaultAssignMessage = assignEmptyText.textContent;
+}
 
-const btnAddXp = document.getElementById("xpBtn");
-const xpContainer = document.querySelector(".xpdiv");
-
-const staffContainer = document.querySelector(".les-staff");
-const photoPreview = document.getElementById("photo-preview");
-
-const roomButtons = document.querySelectorAll(".place-staff");
-
-const profilePopup = document.querySelector(".profile-pop");
-const btnCloseProfile = document.getElementById("close-profile");
-
-const assignPopup = document.querySelector(".assign-pop");
-const assignList = document.querySelector(".assign-list");
-const assignRoomTitle = document.querySelector(".assign-room-name");
-const assignEmptyText = document.querySelector(".assign-empty");
-
-const btnCloseAssignList = document.querySelectorAll(".close-assign");
-const defaultAssignMessage = assignEmptyText ? assignEmptyText.textContent : "";
-
-const MAX_IN_ROOM = 3;
+let MAX_IN_ROOM = 3;
 
 let staffData = [];
 let xpIndex = 0;
@@ -53,8 +57,10 @@ function setupFormPopup() {
     btnCloseForm.addEventListener("click", closeForm);
   }
   if (formPopup) {
-    formPopup.addEventListener("click", (e) => {
-      if (e.target === formPopup) closeForm();
+    formPopup.addEventListener("click", function (e) {
+      if (e.target === formPopup) {
+        closeForm();
+      }
     });
   }
 }
@@ -70,14 +76,18 @@ function closeForm() {
 }
 
 function setupFormEvents() {
-  if (btnAddXp) btnAddXp.addEventListener("click", addExperienceBlock);
-  if (btnSave) btnSave.addEventListener("click", saveStaff);
+  if (btnAddXp) {
+    btnAddXp.addEventListener("click", addExperienceBlock);
+  }
+  if (btnSave) {
+    btnSave.addEventListener("click", saveStaff);
+  }
 }
 
 function addExperienceBlock() {
-  xpIndex++;
+  xpIndex = xpIndex + 1;
 
-  const block = document.createElement("div");
+  let block = document.createElement("div");
   block.className = "exp-form";
 
   block.innerHTML = `
@@ -99,25 +109,29 @@ function addExperienceBlock() {
     <button type="button" class="remove-exp">X</button>
   `;
 
-  block.querySelector(".remove-exp").onclick = () => block.remove();
+  let removeBtn = block.querySelector(".remove-exp");
+  removeBtn.onclick = function () {
+    block.remove();
+  };
+
   xpContainer.appendChild(block);
 }
 
 function saveStaff(e) {
   e.preventDefault();
 
-  if (!fieldName.value.trim() || !fieldRole.value || !fieldEmail.value || !fieldPhone.value) {
-    alert("Veuillez remplir tous les champs obligatoires.");
+  const formData = validateFormFields();
+  if (!formData) {
     return;
   }
 
-  const staff = {
+  let staff = {
     id: Date.now(),
-    name: fieldName.value,
-    role: fieldRole.value,
-    photo: fieldPhoto.value,
-    email: fieldEmail.value,
-    phone: fieldPhone.value,
+    name: formData.name,
+    role: formData.role,
+    photo: formData.photo,
+    email: formData.email,
+    phone: formData.phone,
     experiences: collectExperiences(),
     assignedTo: null
   };
@@ -131,14 +145,34 @@ function saveStaff(e) {
 }
 
 function collectExperiences() {
-  const list = [];
-  const blocks = xpContainer.querySelectorAll(".exp-form");
+  let list = [];
+  let blocks = xpContainer.querySelectorAll(".exp-form");
 
-  blocks.forEach((block, i) => {
-    const ent = block.querySelector(`#nom-${i + 1}`)?.value;
-    const r = block.querySelector(`#role-${i + 1}`)?.value;
-    const d1 = block.querySelector(`#date-de-${i + 1}`)?.value;
-    const d2 = block.querySelector(`#date-a-${i + 1}`)?.value;
+  for (let i = 0; i < blocks.length; i++) {
+    let block = blocks[i];
+
+    let entInput = block.querySelector("#nom-" + (i + 1));
+    let roleInput = block.querySelector("#role-" + (i + 1));
+    let d1Input = block.querySelector("#date-de-" + (i + 1));
+    let d2Input = block.querySelector("#date-a-" + (i + 1));
+
+    let ent = "";
+    let r = "";
+    let d1 = "";
+    let d2 = "";
+
+    if (entInput) {
+      ent = entInput.value;
+    }
+    if (roleInput) {
+      r = roleInput.value;
+    }
+    if (d1Input) {
+      d1 = d1Input.value;
+    }
+    if (d2Input) {
+      d2 = d2Input.value;
+    }
 
     if (ent && r && d1 && d2) {
       list.push({
@@ -148,55 +182,76 @@ function collectExperiences() {
         dateEnd: d2
       });
     }
-  });
+  }
 
   return list;
 }
 
 function setupRoomSelection() {
-  roomButtons.forEach((btn) => {
-    btn.addEventListener("click", () => selectRoom(btn));
-  });
-}
-
-function setupAssignPopup() {
-  btnCloseAssignList.forEach((btn) => btn.addEventListener("click", closeAssignPopup));
-
-  if (assignPopup) {
-    assignPopup.addEventListener("click", (e) => {
-      if (e.target === assignPopup) closeAssignPopup();
+  for (let i = 0; i < roomButtons.length; i++) {
+    let btn = roomButtons[i];
+    btn.addEventListener("click", function () {
+      selectRoom(btn);
     });
   }
 }
 
-function openAssignPopup(room, eligible, msg = "") {
+function setupAssignPopup() {
+  for (let i = 0; i < btnCloseAssignList.length; i++) {
+    let btn = btnCloseAssignList[i];
+    btn.addEventListener("click", closeAssignPopup);
+  }
+
+  if (assignPopup) {
+    assignPopup.addEventListener("click", function (e) {
+      if (e.target === assignPopup) {
+        closeAssignPopup();
+      }
+    });
+  }
+}
+
+function openAssignPopup(room, eligible, msg) {
+  if (msg === undefined) {
+    msg = "";
+  }
+
   currentRoom = room;
 
-  const title = room.querySelector("h3");
-  assignRoomTitle.textContent = title ? title.textContent : "";
+  let title = room.querySelector("h3");
+  if (title) {
+    assignRoomTitle.textContent = title.textContent;
+  } else {
+    assignRoomTitle.textContent = "";
+  }
 
   assignList.innerHTML = "";
 
-  const showMsg = eligible.length === 0 || msg !== "";
+  let showMsg = (eligible.length === 0) || (msg !== "");
   if (showMsg) {
     assignList.style.display = "none";
-    assignEmptyText.textContent = msg || defaultAssignMessage;
+    if (msg !== "") {
+      assignEmptyText.textContent = msg;
+    } else {
+      assignEmptyText.textContent = defaultAssignMessage;
+    }
     assignEmptyText.style.display = "block";
   } else {
     assignList.style.display = "flex";
     assignEmptyText.style.display = "none";
 
-    eligible.forEach((s) => {
-      const btn = document.createElement("button");
+    for (let i = 0; i < eligible.length; i++) {
+      let s = eligible[i];
+      let btn = document.createElement("button");
       btn.type = "button";
       btn.className = "assign-option";
-      btn.innerHTML = `<strong>${s.name}</strong><span>${s.role}</span>`;
-      btn.addEventListener("click", () => {
+      btn.innerHTML = "<strong>" + s.name + "</strong><span>" + s.role + "</span>";
+      btn.addEventListener("click", function () {
         assignStaff(s, currentRoom);
         closeAssignPopup();
       });
       assignList.appendChild(btn);
-    });
+    }
   }
 
   assignPopup.style.display = "flex";
@@ -215,16 +270,19 @@ function closeAssignPopup() {
 }
 
 function selectRoom(btn) {
-  const room = btn.closest(".box");
-  const type = roomType(room);
-  if (!type) return;
+  let room = btn.closest(".box");
+  let type = roomType(room);
 
-  if (isRoomFull(room)) {
-    openAssignPopup(room, [], "Cette salle est déjà complète (maximum 3 staff).");
+  if (!type) {
     return;
   }
 
-  const eligible = getEligibleStaff(type);
+  if (isRoomFull(room)) {
+    openAssignPopup(room, [], "Cette salle est dÃ©jÃ  complÃ¨te (maximum 3 staff).");
+    return;
+  }
+
+  let eligible = getEligibleStaff(type);
   openAssignPopup(room, eligible);
 }
 
@@ -235,17 +293,20 @@ function setupProfilePopup() {
 }
 
 function renderStaffCard(staff) {
-  const div = document.createElement("div");
+  let div = document.createElement("div");
   div.className = "staff-card";
   div.dataset.id = staff.id;
 
   div.innerHTML = `
     <img src="${staff.photo || "default-avatar.png"}">
-    <h3>${staff.name}</h3>
+    <h3 class='staff-name'>${staff.name}</h3>
     <p>${staff.role}</p>
   `;
 
-  div.addEventListener("click", () => openProfile(staff));
+  div.addEventListener("click", function () {
+    openProfile(staff);
+  });
+
   staffContainer.appendChild(div);
 }
 
@@ -263,8 +324,49 @@ function resetForm() {
   photoPreview.src = "";
 }
 
+function validateFormFields() {
+  let nameValue = fieldName.value;
+  let roleValue = fieldRole.value;
+  let emailValue = fieldEmail.value;
+  let phoneValue = fieldPhone.value;
+  let photoValue = fieldPhoto.value;
+
+  if (!nameValue.match(formPatterns.name)) {
+    alert("Nom invalide (lettres + espaces, 3 a 25).");
+    return null;
+  }
+
+  if (!roleValue.match(formPatterns.role)) {
+    alert("Role invalide.");
+    return null;
+  }
+
+  if (!emailValue.match(formPatterns.email)) {
+    alert("Email invalide.");
+    return null;
+  }
+
+  if (!phoneValue.match(formPatterns.phone)) {
+    alert("Telephone invalide (7 a 12 chiffres).");
+    return null;
+  }
+
+  if (photoValue && !photoValue.match(formPatterns.photo)) {
+    alert("URL photo invalide.");
+    return null;
+  }
+
+  return {
+    name: nameValue,
+    role: roleValue,
+    email: emailValue,
+    phone: phoneValue,
+    photo: photoValue
+  };
+}
+
 function isRoomFull(room) {
-  const slot = room.querySelector(".staff-slot");
+  let slot = room.querySelector(".staff-slot");
   return slot.children.length >= MAX_IN_ROOM;
 }
 
@@ -288,20 +390,31 @@ function canEnterRoom(role, type) {
 }
 
 function getEligibleStaff(type) {
-  return staffData.filter((s) => s.assignedTo === null && canEnterRoom(s.role, type));
+  let result = [];
+  for (let i = 0; i < staffData.length; i++) {
+    let s = staffData[i];
+    if (s.assignedTo === null && canEnterRoom(s.role, type)) {
+      result.push(s);
+    }
+  }
+  return result;
 }
 
 function assignStaff(staff, room) {
-  const type = roomType(room);
+  let type = roomType(room);
   staff.assignedTo = type;
 
-  staffContainer.querySelectorAll(".staff-card").forEach((c) => {
-    if (c.dataset.id === String(staff.id)) c.remove();
-  });
+  let cards = staffContainer.querySelectorAll(".staff-card");
+  for (let i = 0; i < cards.length; i++) {
+    let c = cards[i];
+    if (c.dataset.id === String(staff.id)) {
+      c.remove();
+    }
+  }
 
-  const slot = room.querySelector(".staff-slot");
+  let slot = room.querySelector(".staff-slot");
 
-  const card = document.createElement("div");
+  let card = document.createElement("div");
   card.className = "staff-card";
   card.dataset.id = staff.id;
 
@@ -312,10 +425,15 @@ function assignStaff(staff, room) {
     <button class="remove-staff">X</button>
   `;
 
-  card.addEventListener("click", () => openProfile(staff));
+  card.addEventListener("click", function () {
+    openProfile(staff);
+  });
+
   slot.appendChild(card);
 
-  card.querySelector(".remove-staff").addEventListener("click", () => {
+  let removeBtn = card.querySelector(".remove-staff");
+  removeBtn.addEventListener("click", function (event) {
+    event.stopPropagation();
     removeFromRoom(staff, room);
   });
 
@@ -324,49 +442,67 @@ function assignStaff(staff, room) {
 
 function removeFromRoom(staff, room) {
   staff.assignedTo = null;
-  const slot = room.querySelector(".staff-slot");
-  const card = slot.querySelector(`[data-id="${staff.id}"]`);
+  let slot = room.querySelector(".staff-slot");
+  let card = slot.querySelector('[data-id="' + staff.id + '"]');
 
-  if (card) card.remove();
+  if (card) {
+    card.remove();
+  }
 
   renderStaffCard(staff);
   refreshRoomState();
 }
 
 function refreshRoomState() {
-  const rooms = document.querySelectorAll(".staff-grid .box");
+  let rooms = document.querySelectorAll(".staff-grid .box");
 
-  rooms.forEach((room) => {
-    const type = roomType(room);
-    const slot = room.querySelector(".staff-slot");
+  for (let i = 0; i < rooms.length; i++) {
+    let room = rooms[i];
+    let type = roomType(room);
+    let slot = room.querySelector(".staff-slot");
 
     if (type === "conference" || type === "personnel") {
       room.classList.remove("empty");
-      return;
+    } else {
+      if (slot.children.length === 0) {
+        room.classList.add("empty");
+      } else {
+        room.classList.remove("empty");
+      }
     }
-
-    if (slot.children.length === 0) room.classList.add("empty");
-    else room.classList.remove("empty");
-  });
+  }
 }
 
 function openProfile(staff) {
-  document.getElementById("profile-photo").src = staff.photo || "default-avatar.png";
-  document.getElementById("profile-name").textContent = staff.name;
-  document.getElementById("profile-role").textContent = staff.role;
-  document.getElementById("profile-email").textContent = staff.email;
-  document.getElementById("profile-phone").textContent = staff.phone;
-  document.getElementById("profile-location").textContent = staff.assignedTo || "Unassigned";
+  let profilePhoto = document.getElementById("profile-photo");
+  let profileName = document.getElementById("profile-name");
+  let profileRole = document.getElementById("profile-role");
+  let profileEmail = document.getElementById("profile-email");
+  let profilePhone = document.getElementById("profile-phone");
+  let profileLocation = document.getElementById("profile-location");
 
-  const xpList = document.getElementById("profile-exp");
+  profilePhoto.src = staff.photo || "default-avatar.png";
+  profileName.textContent = staff.name;
+  profileRole.textContent = staff.role;
+  profileEmail.textContent = staff.email;
+  profilePhone.textContent = staff.phone;
+
+  if (staff.assignedTo) {
+    profileLocation.textContent = staff.assignedTo;
+  } else {
+    profileLocation.textContent = "Unassigned";
+  }
+
+  let xpList = document.getElementById("profile-exp");
   xpList.innerHTML = "";
 
   if (staff.experiences.length > 0) {
-    staff.experiences.forEach((xp) => {
-      const li = document.createElement("li");
-      li.textContent = `${xp.entreprise} (${xp.dateStart} -- ${xp.dateEnd})`;
+    for (let i = 0; i < staff.experiences.length; i++) {
+      let xp = staff.experiences[i];
+      let li = document.createElement("li");
+      li.textContent = xp.entreprise + xp.dateStart + "--" + xp.dateEnd;
       xpList.appendChild(li);
-    });
+    }
   } else {
     xpList.innerHTML = "<li>Aucune experience</li>";
   }
@@ -377,3 +513,4 @@ function openProfile(staff) {
 function closeProfile() {
   profilePopup.style.display = "none";
 }
+
