@@ -39,9 +39,115 @@ if (assignEmptyText) {
   defaultAssignMessage = assignEmptyText.textContent;
 }
 
-let MAX_IN_ROOM = 3;
+let MaximalIm= 3;
 
-let staffData = [];
+let staffData = [
+  {
+    id: 1,
+    name: "Ayman",
+    role: "Manager",
+    email: "ayman@gmail.com",
+    phone: "0600000000",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 2,
+    name: "Imane",
+    role: "Techniciens IT",
+    email: "imane@gmail.com",
+    phone: "0611111111",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 3,
+    name: "Sara",
+    role: "Techniciens IT",
+    email: "sara@gmail.com",
+    phone: "0622222222",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 4,
+    name: "Youssef",
+    role: "Agents de securite",
+    email: "youssef@gmail.com",
+    phone: "0633333333",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 5,
+    name: "Hajar",
+    role: "Receptionnistes",
+    email: "hajar@gmail.com",
+    phone: "0644444444",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 6,
+    name: "Walid",
+    role: "Techniciens IT",
+    email: "walid@gmail.com",
+    phone: "0655555555",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 7,
+    name: "Karim",
+    role: "Nettoyage",
+    email: "karim@gmail.com",
+    phone: "0666666666",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 8,
+    name: "Nada",
+    role: "Techniciens IT",
+    email: "nada@gmail.com",
+    phone: "0677777777",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 9,
+    name: "Malak",
+    role: "Receptionnistes",
+    email: "malak@gmail.com",
+    phone: "0688888888",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  },
+  {
+    id: 10,
+    name: "Omar",
+    role: "Agents de securite",
+    email: "omar@gmail.com",
+    phone: "0699999999",
+    photo: "",
+    experiences: [],
+    assignedTo: null
+  }
+];
+
+staffData.forEach(staff => {
+  renderStaffCard(staff);
+});
+
 let xpIndex = 0;
 let currentRoom = null;
 
@@ -190,7 +296,7 @@ function collectExperiences() {
 function setupRoomSelection() {
   for (let i = 0; i < roomButtons.length; i++) {
     let btn = roomButtons[i];
-    btn.addEventListener("click", function () {
+    btn.addEventListener("click", () => {
       selectRoom(btn);
     });
   }
@@ -278,7 +384,7 @@ function selectRoom(btn) {
   }
 
   if (isRoomFull(room)) {
-    openAssignPopup(room, [], "Cette salle est dÃ©jÃ  complÃ¨te (maximum 3 staff).");
+    openAssignPopup(room, [], "Cette salle est deja comple (maximum 3 staff).");
     return;
   }
 
@@ -367,7 +473,7 @@ function validateFormFields() {
 
 function isRoomFull(room) {
   let slot = room.querySelector(".staff-slot");
-  return slot.children.length >= MAX_IN_ROOM;
+  return slot.children.length >= MaximalIm;
 }
 
 function roomType(room) {
